@@ -10,20 +10,33 @@ const BASE_URL = "http://deckofcardsapi.com/api/deck";
  *  array.
  */
 function CardApp() {
-  // get a brand new shuffled deck from the API
-  // store that deck ID, remaining # of car in the CardApp state
-  const [deck, setDeck] = useState(null);
-  const [cards, setCards] = useState([]); // ["https://", ... ]
+  const [deck, setDeck] = useState(null); // {deck_id, remaining}
+  const [cards, setCards] = useState([]); // [{id, image}, ... ]
+  const [shuffleCount, setShuffleCount] = useState(0);
+  const [showButton, setShowButton] = useState(true);
+  
 
   useEffect(function getNewDeckOnMount() {
-    async function getNewDeck() {
-      const newDeck = await axios.get(`${BASE_URL}/new/shuffle`);
-
-      const { deck_id, remaining } = newDeck.data;
-      setDeck({ deck_id, remaining });
+    if (deck === null) {
+      async function getNewDeck() {
+        const newDeck = await axios.get(`${BASE_URL}/new/shuffle`);
+        const { deck_id, remaining } = newDeck.data;
+        setDeck({ deck_id, remaining });
+      }
+      getNewDeck();
     }
-    getNewDeck();
-  }, []);
+    else {
+      async function shuffleDeck() {
+        setShowButton(false);
+        const newDeck = await axios.get(`${BASE_URL}/${deck.deck_id}/shuffle`);
+        const { deck_id, remaining } = newDeck.data;
+        setDeck({ deck_id, remaining });
+        setCards(cards => []);
+        setShowButton(true); 
+      }
+      shuffleDeck();
+    }
+  }, [shuffleCount]);
 
   /**
    *  handleClick: Gets a new card from the Deck of Cards API
@@ -33,6 +46,7 @@ function CardApp() {
   function handleClick() {
     if (deck.remaining === 0) {
       alert("Error: no cards remaining!");
+      setShuffleCount(count => count + 1);
     }
     else {
       async function getCard() {
@@ -49,7 +63,7 @@ function CardApp() {
 
   return (
     <div>
-      <button onClick={handleClick}>Gimme a card!</button>
+      {showButton && <button onClick={handleClick}>Gimme a card!</button>}
       < CardArea cards={cards} />
     </div>
   )
