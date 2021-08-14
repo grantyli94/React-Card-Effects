@@ -4,9 +4,11 @@ import React from "react";
 /** CardArea: Displays a container holding each card in the
  *  array of cards, mapped to the Card component.
  * 
- *  cards: // TODO: complete this 
+ *  cards: [{id, image}, ... ]
+ * 
+ *  CardApp --> CardArea --> Card
  */
-function CardArea( {cards} ) {
+function CardArea({ cards }) {
 
   return (
     <div>

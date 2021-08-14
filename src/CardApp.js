@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuid } from 'uuid';
 import axios from 'axios';
 import CardArea from './CardArea';
 const BASE_URL = "http://deckofcardsapi.com/api/deck";
@@ -8,6 +7,8 @@ const BASE_URL = "http://deckofcardsapi.com/api/deck";
  *  deck contains the deck ID and number of remaining cards
  *  cards contains the image URL of each card in the deck as an 
  *  array.
+ * 
+ *  App --> CardApp --> CardArea
  */
 function CardApp() {
   const [deck, setDeck] = useState(null); // {deck_id, remaining}
@@ -51,9 +52,7 @@ function CardApp() {
     else {
       async function getCard() {
         const newCard = await axios.get(`${BASE_URL}/${deck.deck_id}/draw`);
-
-        // TODO: could use the card type ('Queen of Hearts' as the ID instead of UUID)
-        let card = { image: newCard.data.cards[0].image, id: uuid() };
+        let card = { image: newCard.data.cards[0].image, id: newCard.data.cards[0].code };
         setDeck(deck => ({ ...deck, remaining: newCard.data.remaining }));
         setCards(cards => [...cards, card]);
       }
